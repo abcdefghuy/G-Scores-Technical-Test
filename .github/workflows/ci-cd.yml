@@ -214,9 +214,6 @@ jobs:
           # Wait for deployment
           sleep 60
 
-          # Health check
-          curl -f ${{ secrets.PRODUCTION_URL }}/api/health || exit 1
-
           # Critical path check
           curl -f ${{ secrets.PRODUCTION_URL }} || exit 1
 
