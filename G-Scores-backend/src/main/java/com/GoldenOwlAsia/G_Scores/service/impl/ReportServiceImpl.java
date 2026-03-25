@@ -22,12 +22,8 @@ public class ReportServiceImpl implements ReportService {
         // Validate subject is one of the allowed subjects
         Subject validSubject = Subject.fromColumnName(subject);
         
-        List<SubjectStatisticsResponse> subjectStats = statisticsService.getSubjectStatistics();
-        return subjectStats.stream()
-                .filter(stats -> stats.subject().equals(subject))
-                .map(this::buildSubjectRow)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No statistics found for subject: " + subject));
+        SubjectStatisticsResponse stats = statisticsService.getSubjectStatistics(subject);
+        return buildSubjectRow(stats);
     }
 
     private ScoreBandReportResponse buildSubjectRow(SubjectStatisticsResponse stats) {

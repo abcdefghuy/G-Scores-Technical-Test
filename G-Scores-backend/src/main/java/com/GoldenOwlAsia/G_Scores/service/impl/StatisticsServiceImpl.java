@@ -20,9 +20,17 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public List<SubjectStatisticsResponse> getSubjectStatistics() {
+        var countsMap = nativeQueryRepository.countScoreLevelsForAllSubjects();
         return Subject.all().stream()
-                .map(this::buildSubjectStatistics)
+                .map(subject -> buildSubjectStatistics(subject, countsMap.get(subject.columnName())))
                 .toList();
+    }
+
+    @Override
+    public SubjectStatisticsResponse getSubjectStatistics(String subjectName) {
+        Subject subject = Subject.fromColumnName(subjectName);
+        SubjectLevelCounts counts = nativeQueryRepository.countScoreLevelsBySubject(subject.columnName());
+        return buildSubjectStatistics(subject, counts);
     }
 
     @Override
@@ -36,8 +44,10 @@ public class StatisticsServiceImpl implements StatisticsService {
         return SubjectGroup.allCodes();
     }
 
-    private SubjectStatisticsResponse buildSubjectStatistics(Subject subject) {
-        SubjectLevelCounts counts = nativeQueryRepository.countScoreLevelsBySubject(subject.columnName());
+    private SubjectStatisticsResponse buildSubjectStatistics(Subject subject, SubjectLevelCounts counts) {
+        if (counts == null) {
+            counts = new SubjectLevelCounts(0L, 0L, 0L, 0L);
+        }
         long total = counts.excellent() + counts.good() + counts.average() + counts.weak();
         return new SubjectStatisticsResponse(
                 subject.columnName(),

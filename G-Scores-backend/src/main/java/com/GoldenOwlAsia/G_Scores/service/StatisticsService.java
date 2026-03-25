@@ -9,6 +9,8 @@ public interface StatisticsService {
 
     List<SubjectStatisticsResponse> getSubjectStatistics();
 
+    SubjectStatisticsResponse getSubjectStatistics(String subjectName);
+
     List<Top10StudentResponse> getTop10ByGroup(String groupCode);
 
     List<String> getAllGroupCodes();

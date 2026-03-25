@@ -35,6 +35,22 @@ public class NativeQueryRepository {
         ));
     }
 
+    public Map<String, SubjectLevelCounts> countScoreLevelsForAllSubjects() {
+        String sql = buildCountAllLevelsSql();
+        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            Map<String, SubjectLevelCounts> results = new LinkedHashMap<>();
+            for (String col : ALLOWED_COLUMNS) {
+                results.put(col, new SubjectLevelCounts(
+                        rs.getLong(col + "_excellent"),
+                        rs.getLong(col + "_good"),
+                        rs.getLong(col + "_average"),
+                        rs.getLong(col + "_weak")
+                ));
+            }
+            return results;
+        });
+    }
+
     public List<Top10StudentResponse> findTop10ByGroup(List<String> columns) {
         columns.forEach(this::validateColumnName);
         String sql = buildTop10Sql(columns);
@@ -69,6 +85,23 @@ public class NativeQueryRepository {
                 "FROM student_scores WHERE %s IS NOT NULL",
                 col, col, col, col, col, col, col
         );
+    }
+
+    private String buildCountAllLevelsSql() {
+        StringBuilder sql = new StringBuilder("SELECT ");
+        List<String> columns = List.copyOf(ALLOWED_COLUMNS);
+        for (int i = 0; i < columns.size(); i++) {
+            String col = columns.get(i);
+            sql.append(String.format("COUNT(CASE WHEN %s >= 8 THEN 1 END) AS %s_excellent, ", col, col));
+            sql.append(String.format("COUNT(CASE WHEN %s >= 6 AND %s < 8 THEN 1 END) AS %s_good, ", col, col, col));
+            sql.append(String.format("COUNT(CASE WHEN %s >= 4 AND %s < 6 THEN 1 END) AS %s_average, ", col, col, col));
+            sql.append(String.format("COUNT(CASE WHEN %s < 4 AND %s IS NOT NULL THEN 1 END) AS %s_weak", col, col, col));
+            if (i < columns.size() - 1) {
+                sql.append(", ");
+            }
+        }
+        sql.append(" FROM student_scores");
+        return sql.toString();
     }
 
     private String buildTop10Sql(List<String> columns) {
