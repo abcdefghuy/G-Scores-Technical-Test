@@ -159,48 +159,6 @@ jobs:
         if: always()
         run: kill $APP_PID || true
 
-  # Deploy to Staging
-  deploy-staging:
-    name: Deploy to Staging
-    runs-on: ubuntu-latest
-    needs: [quality, build, security]
-    if: github.ref == 'refs/heads/develop'
-    environment: staging
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: "pnpm"
-
-      - name: Deploy to Vercel (Staging)
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          scope: ${{ secrets.VERCEL_ORG_ID }}
-
-      - name: Run smoke tests
-        run: |
-          # Wait for deployment
-          sleep 30
-
-          # Basic health check
-          curl -f ${{ secrets.STAGING_URL }}/api/health || exit 1
-
-          # Check critical pages
-          curl -f ${{ secrets.STAGING_URL }} || exit 1
-
   # Deploy to Production
   deploy-production:
     name: Deploy to Production
@@ -260,7 +218,7 @@ jobs:
   cleanup:
     name: Cleanup
     runs-on: ubuntu-latest
-    needs: [deploy-staging, deploy-production]
+    needs: [deploy-production]
     if: always()
 
     steps:
