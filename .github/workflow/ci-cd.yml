@@ -30,6 +30,9 @@ jobs:
   build:
     name: Build Application
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: G-Scores-frontend
     needs: quality
 
     strategy:
@@ -80,6 +83,9 @@ jobs:
   security:
     name: Security Scan
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: G-Scores-frontend
     needs: quality
 
     steps:
@@ -116,6 +122,9 @@ jobs:
   performance:
     name: Performance Testing
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: G-Scores-frontend
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
@@ -163,6 +172,9 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: G-Scores-frontend
     needs: [quality, build, security, performance]
     if: github.ref == 'refs/heads/main'
     environment: production
@@ -218,6 +230,9 @@ jobs:
   cleanup:
     name: Cleanup
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: G-Scores-frontend
     needs: [deploy-production]
     if: always()
 
