@@ -103,6 +103,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache-dependency-path: "G-Scores-frontend/pnpm-lock.yaml"
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -143,7 +144,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
-
+          cache-dependency-path: "G-Scores-frontend/pnpm-lock.yaml"
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
@@ -194,6 +195,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache-dependency-path: "G-Scores-frontend/pnpm-lock.yaml"
 
       - name: Deploy to Vercel (Production)
         uses: amondnet/vercel-action@v25
