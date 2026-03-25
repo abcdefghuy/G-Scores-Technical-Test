@@ -22,7 +22,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy to Vercel (Production)
+      - name: Run audit check
         run: pnpm audit --audit-level moderate
         continue-on-error: true
 
@@ -37,7 +37,7 @@ jobs:
 
     strategy:
       matrix:
-        environment: [staging, production]
+        environment: [production]
 
     steps:
       - name: Checkout code
@@ -53,6 +53,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache-dependency-path: "G-Scores-frontend/pnpm-lock.yaml"
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
